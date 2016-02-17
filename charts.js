@@ -1,4 +1,5 @@
 var svg = dimple.newSvg("#pieChartContainer", 590, 400);
+var svg2 = dimple.newSvg("#lineChartContainer", 590, 400);
 
 
 var initialData = [
@@ -26,10 +27,14 @@ var paymentsByType = payments.dimension(function(d) { return d.type; }),
     types = paymentVolumeByType.all();
 
 var paymentsByQuantity = payments.dimension(function(d) { return d.quantity; }),
-		paymentVolumeByQuantity = paymentsByQuantity.group().reduceSum(function(d) { return d.total; }),
+	paymentVolumeByQuantity = paymentsByQuantity.group().reduceSum(function(d) { return d.total; }),
     quantities = paymentVolumeByQuantity.all();
 
-var dataForChart = [types, quantities]
+var dataForLineChart = dimple.filterData(data, "type", ["tab", "visa", "cash"]);
+
+var dataForChart = [types, quantities];
+
+console.log(dataForLineChart)
 
 var myChart = new dimple.chart(svg, dataForChart[0]);
 myChart.setBounds(20, 20, 460, 360)
@@ -38,9 +43,17 @@ myChart.addSeries("key", dimple.plot.pie);
 myChart.addLegend(500, 20, 90, 300, "left");
 myChart.draw();
 
+var myChart2 = new dimple.chart(svg2, dataForLineChart);
+myChart2.setBounds(60, 30, 505, 305);
+var x = myChart2.addCategoryAxis("x", "date");
+x.addOrderRule("Date");
+myChart2.addMeasureAxis("y", "total");
+var s = myChart2.addSeries(null, dimple.plot.area);
+myChart2.draw();
+
 function updateChart(dataIndex){
 	myChart.data = dataForChart[dataIndex];
-    myChart.draw(1000, false);
+    myChart.draw(100, false);
 }
 
 function triggerChange(ev){
