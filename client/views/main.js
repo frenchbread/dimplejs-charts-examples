@@ -1,68 +1,45 @@
-Template.home.rendered = function () {
-
-    var svg = dimple.newSvg("#pieChartContainer", "100%", 400);
-    var svg2 = dimple.newSvg("#lineChartContainer", "100%", 400);
+Template.main.rendered = function () {
 
 
-    var initialData = [
-        {date: "2011-11-14T16:17:54Z", quantity: 2, total: 190, tip: 100, type: "tab"},
-        {date: "2011-11-15T16:20:19Z", quantity: 2, total: 190, tip: 100, type: "tab"},
-        {date: "2011-11-16T16:28:54Z", quantity: 1, total: 300, tip: 200, type: "visa"},
-        {date: "2011-11-17T16:30:43Z", quantity: 2, total: 90, tip: 0, type: "tab"},
-        {date: "2011-11-18T16:48:46Z", quantity: 2, total: 90, tip: 0, type: "tab"},
-        {date: "2011-11-19T16:53:41Z", quantity: 2, total: 90, tip: 0, type: "tab"},
-        {date: "2011-11-20T16:54:06Z", quantity: 1, total: 100, tip: 0, type: "cash"},
-        {date: "2011-11-21T16:58:03Z", quantity: 2, total: 90, tip: 0, type: "tab"},
-        {date: "2011-11-22T17:07:21Z", quantity: 2, total: 90, tip: 0, type: "tab"},
-        {date: "2011-11-23T17:22:59Z", quantity: 2, total: 90, tip: 0, type: "tab"},
-        {date: "2011-11-23T17:25:45Z", quantity: 2, total: 200, tip: 0, type: "cash"},
-        {date: "2011-11-25T17:29:52Z", quantity: 1, total: 200, tip: 100, type: "visa"}
+    var arr = [
+        { Animal: "Cats", Value: (Math.random() * 1000000) },
+        { Animal: "Dogs", Value: (Math.random() * 1000000) },
+        { Animal: "Mice", Value: (Math.random() * 1000000) }
     ];
 
+    var data = arr;
 
-    var data = initialData;
-    var dataForCrossFilter = initialData;
-    var payments = crossfilter(dataForCrossFilter);
+    var svg = dimple.newSvg("#barChartContainer", 590, 400);
+    var svg2 = dimple.newSvg("#pieChartContainer", 590, 400);
+    
+    var barChart = new dimple.chart(svg, data);
+    barChart.setBounds(60, 30, 510, 305);
+    var x = barChart.addCategoryAxis("x", "Animal");
+    x.addOrderRule(["Cats", "Dogs", "Mice"]);
+    barChart.addMeasureAxis("y", "Value");
+    barChart.addSeries(null, dimple.plot.bar);
+    barChart.draw();
 
-    var paymentsByType = payments.dimension(function(d) { return d.type; }),
-        paymentVolumeByType = paymentsByType.group().reduceSum(function(d) { return d.total; }),
-        types = paymentVolumeByType.all();
+    var pieChart = new dimple.chart(svg2, data);
+    pieChart.setBounds(20, 20, 460, 360)
+    pieChart.addMeasureAxis("p", "Value");
+    pieChart.addSeries("Animal", dimple.plot.pie);
+    pieChart.addLegend(500, 20, 90, 300, "left");
+    pieChart.draw();
 
-    var paymentsByQuantity = payments.dimension(function(d) { return d.quantity; }),
-        paymentVolumeByQuantity = paymentsByQuantity.group().reduceSum(function(d) { return d.total; }),
-        quantities = paymentVolumeByQuantity.all();
+    d3.select("#btn").on("click", function() {
 
-    var dataForLineChart = dimple.filterData(data, "type", ["tab", "visa", "cash"]);
+        var newData = [
+            {Animal: "Cats", Value: (Math.random() * 1000000)},
+            {Animal: "Dogs", Value: (Math.random() * 1000000)},
+            {Animal: "Mice", Value: (Math.random() * 1000000)}
+        ];
 
-    var dataForChart = [types, quantities];
+        barChart.data = newData;
+        barChart.draw(1000);
 
-    var myChart = new dimple.chart(svg, dataForChart[0]);
-    myChart.setBounds(20, 20, 460, 360)
-    myChart.addMeasureAxis("p", "value");
-    myChart.addSeries("key", dimple.plot.pie);
-    myChart.addLegend(500, 20, 90, 300, "left");
-    myChart.draw();
+        pieChart.data = newData;
+        pieChart.draw(1000);
+    });
 
-    var myChart2 = new dimple.chart(svg2, dataForLineChart);
-    myChart2.setBounds(60, 30, 505, 305);
-    var x = myChart2.addCategoryAxis("x", "date");
-    x.addOrderRule("Date");
-    myChart2.addMeasureAxis("y", "total");
-    var s = myChart2.addSeries(null, dimple.plot.area);
-    myChart2.draw();
-
-    function updateChart(dataIndex){
-        myChart.data = dataForChart[dataIndex];
-        myChart.draw(100, false);
-
-    }
-
-    function triggerChange(ev){
-        updateChart(this.getAttribute('value'));
-    }
-
-    d3.select("#ByType").on('click', triggerChange);
-    d3.select("#ByQuantity").on('click', triggerChange);
-
-
-}
+};
