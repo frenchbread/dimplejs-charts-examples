@@ -1,5 +1,4 @@
-Template.main.rendered = function () {
-
+Template.main.created = function () {
 
     var arr = [
         { Animal: "Cats", Value: (Math.random() * 1000000) },
@@ -7,7 +6,13 @@ Template.main.rendered = function () {
         { Animal: "Mice", Value: (Math.random() * 1000000) }
     ];
 
-    var data = arr;
+    this.dataSet = new ReactiveVar(arr);
+
+};
+
+Template.main.rendered = function () {
+    
+    var data = this.dataSet.get();
 
     var svg = dimple.newSvg("#barChartContainer", 590, 400);
     var svg2 = dimple.newSvg("#pieChartContainer", 590, 400);
