@@ -1,19 +1,23 @@
 Template.main.created = function () {
 
+    // Init sample data set
     var arr = [
         { Animal: "Cats", Value: (Math.random() * 1000000) },
         { Animal: "Dogs", Value: (Math.random() * 1000000) },
         { Animal: "Mice", Value: (Math.random() * 1000000) }
     ];
 
+    // Wrap data set into ReactiveVar and attach it to a template
     this.dataSet = new ReactiveVar(arr);
 
 };
 
 Template.main.rendered = function () {
-    
+
+    // Get data set
     var data = this.dataSet.get();
 
+    // Init SVG elements with width & height
     var svg = dimple.newSvg("#barChartContainer", 590, 400);
     var svg2 = dimple.newSvg("#pieChartContainer", 590, 400);
     
@@ -32,13 +36,17 @@ Template.main.rendered = function () {
     pieChart.addLegend(500, 20, 90, 300, "left");
     pieChart.draw();
 
+    // Listen for button click event
     d3.select("#btn").on("click", function() {
 
+        // Generate data set with new values (Hardcoded approach here)
         var newData = [
             {Animal: "Cats", Value: (Math.random() * 1000000)},
             {Animal: "Dogs", Value: (Math.random() * 1000000)},
             {Animal: "Mice", Value: (Math.random() * 1000000)}
         ];
+
+        // Update charts data & redraw
 
         barChart.data = newData;
         barChart.draw(1000);
